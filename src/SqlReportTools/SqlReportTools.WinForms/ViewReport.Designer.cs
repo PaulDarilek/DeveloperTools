@@ -1,0 +1,207 @@
+﻿namespace SqlReportTools.WinForms
+{
+    partial class ViewReport
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+            this.BtnOpenReport = new System.Windows.Forms.Button();
+            this.ReportCombo = new System.Windows.Forms.ComboBox();
+            this.BtnDataSource = new System.Windows.Forms.Button();
+            this.ComboDataSource = new System.Windows.Forms.ComboBox();
+            this.Tabs = new System.Windows.Forms.TabControl();
+            this.TabReports = new System.Windows.Forms.TabPage();
+            this.TabText = new System.Windows.Forms.TabPage();
+            this.ReportViewer = new Microsoft.Reporting.WinForms.ReportViewer();
+            this.TxtReport = new System.Windows.Forms.TextBox();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.Tabs.SuspendLayout();
+            this.TabReports.SuspendLayout();
+            this.TabText.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
+            this.SuspendLayout();
+            // 
+            // BtnOpenReport
+            // 
+            this.BtnOpenReport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnOpenReport.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.BtnOpenReport.Location = new System.Drawing.Point(1003, 12);
+            this.BtnOpenReport.Name = "BtnOpenReport";
+            this.BtnOpenReport.Size = new System.Drawing.Size(111, 23);
+            this.BtnOpenReport.TabIndex = 2;
+            this.BtnOpenReport.Text = "Open Report";
+            this.BtnOpenReport.UseVisualStyleBackColor = false;
+            this.BtnOpenReport.Click += new System.EventHandler(this.BtnOpenReport_Click);
+            // 
+            // ReportCombo
+            // 
+            this.ReportCombo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ReportCombo.FormattingEnabled = true;
+            this.ReportCombo.Location = new System.Drawing.Point(12, 12);
+            this.ReportCombo.Name = "ReportCombo";
+            this.ReportCombo.Size = new System.Drawing.Size(984, 21);
+            this.ReportCombo.TabIndex = 1;
+            this.ReportCombo.SelectedIndexChanged += new System.EventHandler(this.ReportCombo_SelectedIndexChanged);
+            // 
+            // BtnDataSource
+            // 
+            this.BtnDataSource.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnDataSource.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.BtnDataSource.Location = new System.Drawing.Point(1003, 39);
+            this.BtnDataSource.Name = "BtnDataSource";
+            this.BtnDataSource.Size = new System.Drawing.Size(111, 23);
+            this.BtnDataSource.TabIndex = 5;
+            this.BtnDataSource.Text = "Show Reports";
+            this.BtnDataSource.UseVisualStyleBackColor = false;
+            this.BtnDataSource.Click += new System.EventHandler(this.BtnDataSource_Click);
+            // 
+            // ComboDataSource
+            // 
+            this.ComboDataSource.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ComboDataSource.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ComboDataSource.FormattingEnabled = true;
+            this.ComboDataSource.Location = new System.Drawing.Point(12, 39);
+            this.ComboDataSource.Name = "ComboDataSource";
+            this.ComboDataSource.Size = new System.Drawing.Size(984, 21);
+            this.ComboDataSource.TabIndex = 4;
+            this.ComboDataSource.SelectedIndexChanged += new System.EventHandler(this.ComboDataSource_SelectedIndexChanged);
+            // 
+            // Tabs
+            // 
+            this.Tabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.Tabs.Controls.Add(this.TabText);
+            this.Tabs.Controls.Add(this.TabReports);
+            this.Tabs.Location = new System.Drawing.Point(5, 70);
+            this.Tabs.Name = "Tabs";
+            this.Tabs.SelectedIndex = 0;
+            this.Tabs.Size = new System.Drawing.Size(1111, 468);
+            this.Tabs.TabIndex = 7;
+            // 
+            // TabReports
+            // 
+            this.TabReports.Controls.Add(this.ReportViewer);
+            this.TabReports.Location = new System.Drawing.Point(4, 22);
+            this.TabReports.Name = "TabReports";
+            this.TabReports.Size = new System.Drawing.Size(1094, 378);
+            this.TabReports.TabIndex = 0;
+            this.TabReports.Text = "Reports";
+            this.TabReports.UseVisualStyleBackColor = true;
+            // 
+            // TabText
+            // 
+            this.TabText.Controls.Add(this.TxtReport);
+            this.TabText.Location = new System.Drawing.Point(4, 22);
+            this.TabText.Name = "TabText";
+            this.TabText.Size = new System.Drawing.Size(1103, 442);
+            this.TabText.TabIndex = 1;
+            this.TabText.Text = "Text";
+            this.TabText.UseVisualStyleBackColor = true;
+            // 
+            // ReportViewer
+            // 
+            this.ReportViewer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ReportViewer.DocumentMapWidth = 1;
+            this.ReportViewer.Location = new System.Drawing.Point(3, 5);
+            this.ReportViewer.Name = "ReportViewer";
+            this.ReportViewer.ServerReport.BearerToken = null;
+            this.ReportViewer.Size = new System.Drawing.Size(1088, 369);
+            this.ReportViewer.TabIndex = 2;
+            // 
+            // TxtReport
+            // 
+            this.TxtReport.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TxtReport.Location = new System.Drawing.Point(3, 13);
+            this.TxtReport.Multiline = true;
+            this.TxtReport.Name = "TxtReport";
+            this.TxtReport.Size = new System.Drawing.Size(1097, 426);
+            this.TxtReport.TabIndex = 7;
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.StatusLabel});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 538);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(1126, 22);
+            this.statusStrip1.TabIndex = 8;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // StatusLabel
+            // 
+            this.StatusLabel.Name = "StatusLabel";
+            this.StatusLabel.Size = new System.Drawing.Size(156, 17);
+            this.StatusLabel.Text = "Select Report or Data Source";
+            // 
+            // ViewReport
+            // 
+            this.AccessibleRole = System.Windows.Forms.AccessibleRole.SplitButton;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.Window;
+            this.ClientSize = new System.Drawing.Size(1126, 560);
+            this.Controls.Add(this.statusStrip1);
+            this.Controls.Add(this.Tabs);
+            this.Controls.Add(this.ComboDataSource);
+            this.Controls.Add(this.BtnDataSource);
+            this.Controls.Add(this.ReportCombo);
+            this.Controls.Add(this.BtnOpenReport);
+            this.Name = "ViewReport";
+            this.Text = "View Reports";
+            this.Load += new System.EventHandler(this.Form1_Load);
+            this.Tabs.ResumeLayout(false);
+            this.TabReports.ResumeLayout(false);
+            this.TabText.ResumeLayout(false);
+            this.TabText.PerformLayout();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
+            this.ResumeLayout(false);
+            this.PerformLayout();
+
+        }
+
+        #endregion
+        private System.Windows.Forms.Button BtnOpenReport;
+        private System.Windows.Forms.ComboBox ReportCombo;
+        private System.Windows.Forms.Button BtnDataSource;
+        private System.Windows.Forms.ComboBox ComboDataSource;
+        private System.Windows.Forms.TabControl Tabs;
+        private System.Windows.Forms.TabPage TabText;
+        private System.Windows.Forms.TabPage TabReports;
+        private System.Windows.Forms.TextBox TxtReport;
+        private Microsoft.Reporting.WinForms.ReportViewer ReportViewer;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel StatusLabel;
+    }
+}

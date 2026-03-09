@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net481</TargetFramework>
+    <Nullable>disable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>false</ImplicitUsings>
+    <UserSecretsId>SqlReportTools.WinForms.2026_03</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="6.1.4" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="10.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.3" />
+    <PackageReference Include="Microsoft.ReportingServices.ReportViewerControl.WinForms" Version="150.1652.0" />
+    <PackageReference Include="Microsoft.SqlServer.Types" Version="170.1000.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SqlReportTools\SqlReportTools.csproj" />
+  </ItemGroup>
+   <!-- net10.0-windows -->
+
+</Project>

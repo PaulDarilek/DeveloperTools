@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SqlReportTools.WinForms/SqlReportTools.WinForms.csproj" Id="aaee0311-aeff-4f8e-8c17-3d71c164fb5d" />
+  <Project Path="SqlReportTools/SqlReportTools.csproj" Id="a005349f-3652-44e2-a47f-c1b578852323" />
+</Solution>
