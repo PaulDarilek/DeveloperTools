@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Data;
-using Microsoft.Data.SqlClient;
 using System.Diagnostics;
 
 namespace SqlReportTools
@@ -37,12 +35,6 @@ namespace SqlReportTools
         public ReportDataSet()
         {
             Fields = new List<ReportField>();
-        }
-
-        public void FillDataSet(SqlConnection sqlConnection, DataSet dataSet)
-        {
-            var dataAdapter = new SqlDataAdapter(CommandText, sqlConnection);
-            dataAdapter.Fill(dataSet, Name);
         }
 
     }

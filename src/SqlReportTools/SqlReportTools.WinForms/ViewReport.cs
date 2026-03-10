@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -12,9 +11,10 @@ namespace SqlReportTools.WinForms
         public ReportRunner Helper { get; }
         private bool IgnoreCombo { get; set;  }
 
-        public ViewReport(ReportRunner reportRunner)
+        public ViewReport(Settings settings)
         {
-            Helper = reportRunner;
+
+            Helper = new ReportRunner(settings, AppendMessage);
             InitializeComponent();
 
             Text = "View Report Form";
@@ -41,10 +41,8 @@ namespace SqlReportTools.WinForms
 
         private void FillCombos()
         {
-            foreach (var item in Helper.RdlManager.GetReports())
-            {
-                ReportCombo.Items.Add(item.File.FullName);
-            }
+            ReportCombo.Items.AddRange(Helper.RdlManager.GetReportPaths());
+
             ReportCombo.SelectedIndex = ReportCombo.Items.Count > 0 ? 0 : -1;
 
             foreach (var item in Helper.RdsManager.GetDataSources())
@@ -57,9 +55,10 @@ namespace SqlReportTools.WinForms
         private void BtnOpenReport_Click(object sender, EventArgs e)
         {
             ClearMessage();
-            if(Helper.LocateReport(new FileInfo(ReportCombo.Text), AppendMessage))
+            var report = Helper.LocateReport(new FileInfo(ReportCombo.Text));
+            if (report != null)
             {
-                Helper.Run(this.ReportViewer);
+                Helper.Run(this.ReportViewer, report);
                 TabReports.Focus();
             }
         }
@@ -78,8 +77,7 @@ namespace SqlReportTools.WinForms
             {
                 var id = text.Substring(posStart+1, posEnd - posStart - 1);
                 var usage =
-                    Helper.RdlManager.GetReports()
-                    .Where(x => x.DataSources.Any(y => y.DataSourceID == id))
+                    Helper.RdlManager.GetReports(x => x.DataSources.Any(ds => ds.DataSourceID == id))
                     .ToList();
                 foreach (var report in usage)
                 {
@@ -92,9 +90,10 @@ namespace SqlReportTools.WinForms
         {
             if (IgnoreCombo) return;
             ClearMessage();
-            if (Helper.LocateReport(new FileInfo(ReportCombo.Text), AppendMessage))
+            var report = Helper.LocateReport(new FileInfo(ReportCombo.Text));
+            if (report != null)
             {
-                var json = JsonSerializer.Serialize(Helper.Report, new JsonSerializerOptions { WriteIndented = true });
+                var json = JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true });
                 AppendMessage(json);
             }
         }

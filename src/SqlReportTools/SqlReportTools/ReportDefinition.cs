@@ -24,9 +24,6 @@ namespace SqlReportTools
 
         public HashSet<ReportDataSet> DataSets { get; } = new HashSet<ReportDataSet>();
 
-        [JsonIgnore]
-        public DataSet DataSet { get; set; } 
-
         public List<Parameter> Parameters { get; } = new List<Parameter>();
         
         public ReportDefinition(FileInfo file)
@@ -36,9 +33,10 @@ namespace SqlReportTools
 
         public void AddDataSources(IEnumerable<ReportDataSource> sources) => DataSources.UnionWith(sources);
 
-        public void FillDataSets(Action<string> logMessage)
+        //TODO: Add Parameters!
+        public DataSet FillDataSets(Action<string> logMessage, string devSqlServer = null)
         {
-            DataSet = new DataSet();
+            var dataSet = new DataSet();
 
             foreach (var rptDataSet in DataSets)
             {
@@ -49,15 +47,26 @@ namespace SqlReportTools
                     DataSources.FirstOrDefault(x => x.Name == rptDataSet.Name);
 
                 logMessage?.Invoke($"Connecting: {dataSource.ConnectString}");
-                var conn = dataSource.OpenSqlConnection();
+                var conn = dataSource.OpenSqlConnection(devSqlServer);
                 logMessage?.Invoke($"Connected: {dataSource.Name}");
 
                 logMessage?.Invoke($"Fill: {rptDataSet.DataSourceName}");
-                var dataAdapter = new SqlDataAdapter(rptDataSet.CommandText, conn);
-                dataAdapter.Fill(DataSet, rptDataSet.Name);
+                var cmd = new SqlCommand()
+                {
+                    CommandText = rptDataSet.CommandText,
+                    CommandType = rptDataSet.CommandType == "StoredProcedure" ? CommandType.StoredProcedure : CommandType.Text,
+                    Connection = conn,
+                    CommandTimeout = 120,
+                };
+                //TODO: Add Parameters!
+                //cmd.Parameters.Add()
+
+                var dataAdapter = new SqlDataAdapter(cmd);
+                dataAdapter.Fill(dataSet, rptDataSet.Name);
                 logMessage?.Invoke($"Done: {rptDataSet.DataSourceName}");
             }
 
+            return dataSet;
         }
 
 

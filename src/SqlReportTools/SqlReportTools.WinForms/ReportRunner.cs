@@ -1,31 +1,25 @@
-﻿using Microsoft.Data.SqlClient;
-using Microsoft.Reporting.WinForms;
+﻿using Microsoft.Reporting.WinForms;
 using System;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Configuration;
-using Microsoft.Extensions.Configuration;
 
 namespace SqlReportTools.WinForms
 {
     public class ReportRunner
     {
         private Settings Settings { get; }
+        private Action<string> SendMessage { get; }
 
         public ReportManager RdlManager { get; } 
         public DataSourceManager RdsManager { get; } 
 
-        public FileInfo ReportFile { get; private set; }
-        public string ReportXml { get; private set; }
-        public ReportDefinition Report { get; private set; }
-        private LocalReport LocalReport { get; set; }
-        private Action<string> SendMessage { get; set;  }
 
-        public ReportRunner(Settings settings)
+        public ReportRunner(Settings settings, Action<string> sendMessage)
         {
             Settings = settings;
+            SendMessage = sendMessage;
  
             RdlManager = new ReportManager();
             RdsManager = new DataSourceManager();
@@ -37,70 +31,66 @@ namespace SqlReportTools.WinForms
             RdlManager.AddReports(RdsManager, Settings.SqlReportsDirectory);
         }
 
-        public bool LocateReport(FileInfo reportFile, Action<string> sendMessage)
+        public ReportDefinition LocateReport(FileInfo reportFile)
         {
-            ReportFile = reportFile;
-            SendMessage = sendMessage;
-
-            ReportXml = null;
-            Report = null;
 
             if (!reportFile.Exists)
             {
-                SendMessage?.Invoke("File Does not exist.");
-                return false;
+                Log("File Does not exist.");
+                return null;
             }
 
-            ReportXml = File.ReadAllText(ReportFile.FullName);
-
-            Report =
-                RdlManager.GetReports().Where(x => x.File.FullName == reportFile.FullName).FirstOrDefault() ??
+            var report =
+                RdlManager.GetReports(x => x.File.FullName == reportFile.FullName).FirstOrDefault() ??
                 RdlManager.AddReport(reportFile, RdsManager);
-            if (Report == null)
+
+            if (report == null)
             {
-                sendMessage?.Invoke("Error: Cannot Parse Report!");
-                return false;
+                Log("Error: Cannot Parse Report!");
             }
             
-            return true;
+            return report;
         }
 
-        public void Run(ReportViewer viewer)
+        public void Run(ReportViewer viewer, ReportDefinition report)
         {
-            if (ReportFile == null || !ReportFile.Exists || Report == null || Report.File.Name != ReportFile.Name)
+            if (report == null || report.File == null || !report.File.Exists)
             {
                 return;
             }
 
             // Set the processing mode for the ReportViewer to Local  
             viewer.ProcessingMode = ProcessingMode.Local;
-            viewer.LocalReport.ReportPath = ReportFile.FullName;
+            viewer.LocalReport.ReportPath = report.File.FullName;
 
-            LocalReport = viewer.LocalReport;
-            AddReportParameter();
+            var localReport = viewer.LocalReport;
+            AddReportParameter(localReport);
 
-            Report.FillDataSets(SendMessage);
             // -------------------------
             // Data Sets
             // -------------------------
-            foreach (var rptDataSet in Report.DataSets )
+            try
             {
-                var dataSet = BuildDataSet(rptDataSet);
-                SendMessage?.Invoke($"Connect DataSet: {rptDataSet.Name}");
-                AddDataSetToLocalReport(dataSet);
-            }
+                var dataSet = report.FillDataSets(Log, Settings.DevSqlServer);
+                AddDataSetToLocalReport(localReport, dataSet);
 
-            AddDataSources();
+                AddDataSources(localReport, report);
+            }
+            catch(Exception ex)
+            {
+                Log($"Exception: {ex.GetType().Name} {ex.Message}");
+            }
 
             // Refresh the report  
             viewer.RefreshReport();
         }
 
-        private void AddReportParameter()
+        /// <summary>Add Parameters to the Report</summary>
+        private void AddReportParameter(LocalReport localReport)
         {
-            foreach (var parm in LocalReport.GetParameters())
+            foreach (var parm in localReport.GetParameters())
             {
-                Trace.WriteLine($"{parm.Name} = {parm.DataType}");
+                Log($"Parameter: {parm.Name} = {parm.DataType}");
             }
 
             //// Create a report parameter for the sales order number   
@@ -115,31 +105,10 @@ namespace SqlReportTools.WinForms
             //    new ReportParameter[] { rpSalesOrderNumber });
         }
 
-        private DataSet BuildDataSet(ReportDataSet rptDataSet)
+
+        private void AddDataSetToLocalReport(LocalReport localReport, DataSet dataset)
         {
-            DataSet dataset = new DataSet(rptDataSet.Name);
-            var dataSource =
-                RdsManager.GetDataSourceByName(rptDataSet.DataSourceName) ??
-                RdsManager.GetDataSourceByName(rptDataSet.Name);
-
-            SendMessage?.Invoke($"Connecting: {dataSource.ConnectString}");
-            var conn = dataSource.OpenSqlConnection();
-            SendMessage?.Invoke($"Connected: {dataSource.Name}");
-
-            SendMessage?.Invoke($"Fill: {rptDataSet.DataSourceName}");
-            rptDataSet.FillDataSet(conn, dataset);
-            SendMessage?.Invoke($"Done: {rptDataSet.DataSourceName}");
-
-            //Get Each DataAdapter and fill the dataset
-            //var tablesAdapter = GetTableAdapter(TableName);
-            //tablesAdapter.Fill(dataset, "Tables");
-
-            return dataset;
-        }
-
-        private void AddDataSetToLocalReport(DataSet dataset)
-        {
-            var expected = LocalReport.GetDataSourceNames();
+            var expected = localReport.GetDataSourceNames();
             Debug.Assert(expected.Count > 0);
 
             foreach (DataTable table in dataset.Tables)
@@ -150,22 +119,28 @@ namespace SqlReportTools.WinForms
                     Value = table,
                 };
 
-                LocalReport.DataSources.Add(rptDataSource);
+                localReport.DataSources.Add(rptDataSource);
             }
         }
 
-        private void AddDataSources()
+        private void AddDataSources(LocalReport localReport, ReportDefinition report)
         {
-            string[] sources = LocalReport.GetDataSourceNames().ToArray();
+            string[] sources = localReport.GetDataSourceNames().ToArray();
             Debug.Assert(sources.Length > 0);
 
-            Debug.Assert(LocalReport.DataSources.Count == Report.DataSources.Count);
+            Debug.Assert(localReport.DataSources.Count == report.DataSources.Count);
 
-            foreach (var item in Report.DataSources)
+            foreach (var item in report.DataSources)
             {
-                Debug.WriteLine($"{item.Name} = {item.ConnectString}");
+                Log($"{item.Name} = {item.ConnectString}");
             }
         }
+
+        private void Log(string message)
+        {
+            Trace.WriteLine(message);
+            SendMessage?.Invoke(message);
+        } 
 
  
     }

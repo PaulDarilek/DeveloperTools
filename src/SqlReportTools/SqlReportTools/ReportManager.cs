@@ -19,7 +19,9 @@ namespace SqlReportTools
         }
 
         public IEnumerable<ReportDefinition> GetReports() => Reports.ToArray();
-        public IEnumerable<ReportDefinition> GetReportsWithDataSource(Func<ReportDataSource, bool> predicate) => Reports.Where(rpt => rpt.DataSources.Any(predicate));
+
+        public string[] GetReportPaths() => Reports.Select(x => x.File?.FullName).ToArray();
+        public IEnumerable<ReportDefinition> GetReports(Func<ReportDefinition, bool> predicate) => predicate == null ? Reports : Reports.Where(predicate);
 
 
         /// <summary>Load Files from the File System</summary>

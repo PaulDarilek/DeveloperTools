@@ -1,4 +1,5 @@
 ﻿using Microsoft.Data.SqlClient;
+using System;
 using System.IO;
 using System.Text.Json.Serialization;
 
@@ -29,12 +30,19 @@ namespace SqlReportTools
 
         public bool IsValid => !string.IsNullOrEmpty(Name) && !string.IsNullOrEmpty(DataSourceID) && !string.IsNullOrEmpty(ConnectString);
 
-        public SqlConnection OpenSqlConnection()
+        public SqlConnection OpenSqlConnection(string devSqlServer = null)
         {
             var builder = new SqlConnectionStringBuilder(ConnectString)
             {
-                IntegratedSecurity = true
+                IntegratedSecurity = true,
+                TrustServerCertificate = true,
             };
+
+            if (!string.IsNullOrEmpty(devSqlServer))
+            {
+                builder.DataSource = devSqlServer;
+            }
+         
             ConnectString = builder.ToString();
 
             var sqlConnection = new SqlConnection(ConnectString);
