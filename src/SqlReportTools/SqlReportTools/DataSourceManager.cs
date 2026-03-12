@@ -12,23 +12,26 @@ namespace SqlReportTools
     {
         private HashSet<ReportDataSource> DataSources { get; } 
         private const StringComparison IgnoreCase = StringComparison.InvariantCultureIgnoreCase;
+        private Action<string> Logger { get; }
 
         /// <summary>Constructor</summary>
         [DebuggerStepThrough]
-        public DataSourceManager()
+        public DataSourceManager(Action<string> logger)
         {
+            Logger = logger;
             DataSources = new HashSet<ReportDataSource>();
         }
 
         public IEnumerable<ReportDataSource> GetDataSources() => DataSources.ToArray();
 
         public ReportDataSource GetDataSourceById(string dataSourceID) => DataSources.FirstOrDefault(x => x.DataSourceID.Equals(dataSourceID, IgnoreCase));
-        public ReportDataSource GetDataSourceByName(string name) => DataSources.FirstOrDefault(x => x.Name.Equals(name, IgnoreCase));
+        public IEnumerable<ReportDataSource> GetDataSourceByName(string name) => DataSources.Where(x => x.Name.Equals(name, IgnoreCase));
         public ReportDataSource GetDataSourceByFile(FileInfo file) 
         {
             if (file == null) return null;
             return DataSources.FirstOrDefault(x => x.File != null && x.File.FullName.Equals(file.FullName, IgnoreCase));
         }
+
 
         /// <summary>Load Files from the File System</summary>
         /// <param name="directory"></param>
@@ -45,7 +48,7 @@ namespace SqlReportTools
         public ReportDataSource AddFromFile(FileInfo file)
         {
             ReportDataSource dataSource = new ReportDataSource() { File = file };
-            if(ParseFile(dataSource))
+            if(ParseRdsFileXml(dataSource))
             {
                 FindOrAdd(dataSource);
             }
@@ -56,13 +59,38 @@ namespace SqlReportTools
             return dataSource;
         }
 
+        /// <summary>Parse from xPath DataSources/DataSource stored in SSRS *.rdl files</summary>
+        public IEnumerable<ReportDataSource> ParseRdlDataSources(XElement doc)
+        {
+            XElement root = doc.Elements().FirstOrDefault(x => x.Name.LocalName == "DataSources");
+            Debug.Assert(root != null && root.Name.LocalName == "DataSources");
 
-        public ReportDataSource FindOrAdd(ReportDataSource dataSource)
+            if (root != null)
+            {
+                XNamespace ns = root?.GetDefaultNamespace();
+                foreach (XElement node in root.Elements(ns + "DataSource"))
+                {
+                    var dataSource = new ReportDataSource
+                    {
+                        Name = node.Attribute("Name").Value,
+                        DataSourceID = node.Elements().FirstOrDefault(x => x.Name.LocalName == "DataSourceID")?.Value ?? string.Empty
+                    };
+
+                    // Connect to Global List.
+                    dataSource = FindOrAdd(dataSource);
+                    yield return dataSource;
+                }
+            }
+        }
+
+
+
+        private ReportDataSource FindOrAdd(ReportDataSource dataSource)
         {
             ReportDataSource match =
                 GetDataSourceByFile(dataSource.File)
                 ?? GetDataSourceById(dataSource.DataSourceID)
-                ?? GetDataSourceByName(dataSource.Name);
+                ?? GetDataSourceByName(dataSource.Name).FirstOrDefault();
 
             if (match == null)
             {
@@ -71,13 +99,15 @@ namespace SqlReportTools
                 DataSources.Add(dataSource);
             }
 
+            Log($"DataSource: {match.File?.FullName ?? match.DataSourceID} = {match.ConnectString}");
+
             return match;
         }
 
         /// <summary>Parse RDL file</summary>
         /// <param name="dataSource"></param>
         /// <returns></returns>
-        public bool ParseFile(ReportDataSource dataSource)
+        private bool ParseRdsFileXml(ReportDataSource dataSource)
         {
             if (dataSource.File == null || !dataSource.File.Exists) return false;
 
@@ -117,28 +147,10 @@ namespace SqlReportTools
             return dataSource.IsValid;
         }
 
-        /// <summary>Parse from xPath DataSources/DataSource stored in SSRS *.rdl files</summary>
-        public IEnumerable<ReportDataSource> ParseDataSources(XElement doc)
+        private void Log(string message)
         {
-            XElement root = doc.Elements().FirstOrDefault(x => x.Name.LocalName == "DataSources");
-            Debug.Assert(root != null && root.Name.LocalName == "DataSources");
-
-            if (root != null)
-            {
-                XNamespace ns = root?.GetDefaultNamespace();
-                foreach (XElement node in root.Elements(ns + "DataSource"))
-                {
-                    var dataSource = new ReportDataSource
-                    {
-                        Name = node.Attribute("Name").Value,
-                        DataSourceID = node.Elements().FirstOrDefault(x => x.Name.LocalName == "DataSourceID")?.Value ?? string.Empty
-                    };
-
-                    // Connect to Global List.
-                    dataSource = FindOrAdd(dataSource);
-                    yield return dataSource;
-                }
-            }
+            Trace.WriteLine(message);
+            Logger?.Invoke(message);
         }
 
     }

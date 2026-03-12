@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -11,16 +12,17 @@ namespace SqlReportTools
     public class ReportManager
     {
 
-        private HashSet<ReportDefinition> Reports { get; } 
+        private HashSet<ReportDefinition> Reports { get; }
+        private Action<string> Logger { get; }
 
         /// <summary>Constructor</summary>
-        public ReportManager() {
+        public ReportManager(Action<string> logger) {
+            Logger = logger;
             Reports = new HashSet<ReportDefinition>();
         }
 
-        public IEnumerable<ReportDefinition> GetReports() => Reports.ToArray();
-
         public string[] GetReportPaths() => Reports.Select(x => x.File?.FullName).ToArray();
+        
         public IEnumerable<ReportDefinition> GetReports(Func<ReportDefinition, bool> predicate) => predicate == null ? Reports : Reports.Where(predicate);
 
 
@@ -43,9 +45,42 @@ namespace SqlReportTools
         public ReportDefinition AddReport(FileInfo file, DataSourceManager dataSourceManager)
         {
             ReportDefinition report = new ReportDefinition(file);
-            ParseFile(report, dataSourceManager);
+            ParseXml(report, dataSourceManager);
             AddReport(report);
             return report;
+        }
+
+        /// <summary>Reads the Report RDL File and parses the XML</summary>
+        /// <param name="report"></param>
+        /// <param name="dataSourceManager"></param>
+        /// <returns></returns>
+        public bool ParseXml(ReportDefinition report, DataSourceManager dataSourceManager)
+        {
+            if (report.File == null || !report.File.Exists) return false;
+
+            string xml = File.ReadAllText(report.File.FullName);
+
+            XElement doc = XElement.Parse(xml);
+            XNamespace ns = doc.GetDefaultNamespace();
+
+            report.ReportID = doc.Elements().FirstOrDefault(x => x.Name.LocalName == "ReportID")?.Value;
+
+            ParseReportParameters(report, doc, ns);
+
+            if (dataSourceManager != null)
+            {
+                var dataSources = dataSourceManager.ParseRdlDataSources(doc).ToList();
+                report.AddDataSources(dataSources);
+            }
+
+
+            XElement dataSets = doc.Elements().FirstOrDefault(x => x.Name.LocalName == "DataSets");
+            foreach (XElement node in dataSets.Elements(ns + "DataSet"))
+            {
+                var dataSet = ParseXmlDataSet(node, ns, report.Parameters);
+                report.DataSets.Add(dataSet);
+            }
+            return true;
         }
 
         private void AddReport(ReportDefinition report)
@@ -59,47 +94,138 @@ namespace SqlReportTools
             Reports.Add(report);
         }
 
-        public bool ParseFile(ReportDefinition report, DataSourceManager dataSourceManager)
+        private void ParseReportParameters(ReportDefinition report, XElement doc, XNamespace ns)
         {
-            if (report.File == null || !report.File.Exists) return false;
-
-            string xml = File.ReadAllText(report.File.FullName);
-            XElement doc = XElement.Parse(xml);
-
-            report.ReportID = doc.Elements().FirstOrDefault(x => x.Name.LocalName == "ReportID")?.Value;
-
-            if(dataSourceManager != null)
+            var xParms = 
+                doc.Element(ns + "ReportParameters") ??
+                doc.Elements().FirstOrDefault(x => x.Name.LocalName == "ReportParameters");
+            
+            if (xParms != null)
             {
-                var dataSources = dataSourceManager.ParseDataSources(doc).ToList();
-                report.AddDataSources(dataSources);
-            }
+                foreach (var xParm in xParms.Elements(ns + "ReportParameter"))
+                {
+                    var rptParm = new ReportParameter
+                    {
+                        Name = xParm.Attribute("Name")?.Value,
+                        DataType = xParm.Element(ns + "DataType")?.Value,
+                        AllowBlank = xParm.Element(ns + "AllowBlank")?.Value.Equals("true", StringComparison.OrdinalIgnoreCase),
+                        Prompt = xParm.Element(ns + "Prompt")?.Value,
+                        UsedInQuery = xParm.Element(ns + "UsedInQuery")?.Value.Equals("True", StringComparison.OrdinalIgnoreCase),
+                        MultiValue = xParm.Element(ns + "MultiValue")?.Value.Equals("true", StringComparison.OrdinalIgnoreCase),
+                    };
 
-            XElement root = doc.Elements().FirstOrDefault(x => x.Name.LocalName == "DataSets");
-            XNamespace ns = root?.GetDefaultNamespace();
-            foreach (XElement node in root.Elements(ns + "DataSet"))
-            {
-                var dataSet = new ReportDataSet();
-                FillFromXml(dataSet, node, ns);
-                report.DataSets.Add(dataSet);
+                    XElement values = xParm.Element(ns + "DefaultValue")?.Element(ns + "Values");
+                    if (values != null)
+                    {
+                        foreach (var value in values.Elements(ns + "Value"))
+                        {
+                            var strValue = ParseValue(value?.Value);
+                            if(strValue != null)
+                            {
+                                rptParm.DefaultValues.Add(strValue);
+                            }
+                        }
+                    }
+
+                    XElement validValues = xParm.Element(ns + "ValidValues");
+                    XElement parameterValues = validValues?.Element(ns + "ParameterValues");
+
+                    if (validValues != null && parameterValues != null)
+                    {
+                        Log($"{report.File.FullName} Has Parameters.");
+
+                        foreach (var parmValue in parameterValues.Elements(ns + "ParameterValue"))
+                        {
+                            var pValue = new ValidValue
+                            {
+                                Value = parmValue.Element(ns + "Value")?.Value,
+                                Label = parmValue.Element(ns + "Label")?.Value
+                            };
+                            if (pValue.Value != null)
+                            {
+                                if(pValue.Value.StartsWith("=") == true)
+                                {
+                                    pValue.Label = pValue.Label ?? pValue.Value;
+                                    pValue.Value = ParseValue(pValue.Value);
+                                }
+                                rptParm.ValidValues.Add(pValue);
+                            }
+                        }
+                    }
+
+                    report.Parameters.Add(rptParm);
+                }
             }
-            return true;
         }
 
-        private void FillFromXml(ReportDataSet dataSet, XElement node, XNamespace ns)
+        private string ParseValue(string value)
         {
-            dataSet.Name = node.Attribute("Name")?.Value;
+            if (string.IsNullOrEmpty(value) || value[0] != '=')
+                return value;
 
-            var query = node.Element(ns + "Query");
+            switch (value)
+            {
+                case "=User!UserID": 
+                    return $"{Environment.UserDomainName}\\{Environment.UserName}";
+                default:
+                    FixSpacing("=()&"); // fix spacing around these characters
+                    ReplaceValue($"\"{DateTime.Today.Year}\"", "Year(Today)");
+                    ReplaceValue("", "\"&\""); // combine concatenated strings together
+                    if(value.StartsWith("=CDate(\"") && value.EndsWith("\")"))
+                    {
+                        value = value.Substring(8, value.Length - 10);
+                        return value;
+                    }
+                    Log($"TODO: Parse {value}");
+
+                    break;
+            }
+
+            return value;
+
+            void FixSpacing(string chars)
+            {
+                for (int i = 0; i < chars.Length; i++)
+                {
+                    char ch = chars[i];
+                    ReplaceValue($"{ch}", $" {ch} ", $"{ch} ", $" {ch}");
+                }
+            }
+
+            void ReplaceValue(string replacement, params string[] keys)
+            {
+                foreach (var key in keys)
+                {
+                    if (value.Contains(key))
+                    {
+                        value = value.Replace(key, replacement);
+                    }
+                }
+            }
+        }
+
+
+        private ReportDataSet ParseXmlDataSet(XElement dataSetNode, XNamespace ns, IEnumerable<ReportParameter> reportParameters)
+        {
+            var dataSet = new ReportDataSet
+            {
+                Name = dataSetNode.Attribute("Name")?.Value
+            };
+
+            var query = dataSetNode.Element(ns + "Query");
             Debug.Assert(query != null);
             if (query != null)
             {
                 dataSet.DataSourceName = query.Element(ns + "DataSourceName")?.Value;
                 dataSet.CommandType = query.Element(ns + "CommandType")?.Value;
                 dataSet.CommandText = query.Element(ns + "CommandText")?.Value;
+
+                ParseQueryParms(dataSet, query, ns, reportParameters);
             }
+
             Debug.Assert(dataSet.IsValid);
 
-            var fields = node.Element(ns + "Fields");
+            var fields = dataSetNode.Element(ns + "Fields");
             Debug.Assert(fields != null);
             foreach (XElement fieldNode in fields.Elements(ns + "Field"))
             {
@@ -112,6 +238,32 @@ namespace SqlReportTools
                 dataSet.Fields.Add(field);
             }
             Debug.Assert(dataSet.Fields.Count > 0);
+            return dataSet;
+        }
+
+        private static void ParseQueryParms(ReportDataSet dataSet, XElement query, XNamespace ns, IEnumerable<ReportParameter> reportParameters)
+        {
+            var parms = query.Element(ns + "QueryParameters");
+            if (parms != null)
+            {
+                foreach (var item in parms.Elements(ns + "QueryParameter"))
+                {
+                    var qParm = new QueryParameter()
+                    {
+                        Name = item.Attribute("Name")?.Value,
+                        Value = item.Element(ns + "Value").Value,
+                        Parameter = null,
+                    };
+                    qParm.SetParameterReference(reportParameters);
+                    dataSet.QueryParameters.Add(qParm);
+                }
+            }
+        }
+
+        private void Log(string message)
+        {
+            Logger?.Invoke(message);
+            Trace.WriteLine(message);
         }
 
     }

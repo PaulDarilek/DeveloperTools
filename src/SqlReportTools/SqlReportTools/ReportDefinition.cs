@@ -15,23 +15,34 @@ namespace SqlReportTools
     {
         /// <summary>File containing the XML definition</summary>
         [JsonConverter(typeof(FileInfoJsonConverter))]
-        public FileInfo File { get; set; }
+        public FileInfo File { get; }
 
+        /// <summary>Unique Guid type Identifier</summary>
         public string ReportID { get; set; }
+
+        /// <summary>Optional Parameters for the Report</summary>
+        public HashSet<ReportParameter> Parameters { get; } = new HashSet<ReportParameter>();
 
         /// <summary>Data Sources</summary>
         public HashSet<ReportDataSource> DataSources { get; } = new HashSet<ReportDataSource>();
 
+        /// <summary>DataSets that utilize one ore more DataSources</summary>
         public HashSet<ReportDataSet> DataSets { get; } = new HashSet<ReportDataSet>();
 
-        public List<Parameter> Parameters { get; } = new List<Parameter>();
-        
+
+        /// <summary>Constructor</summary>
+        /// <param name="file">Location of .rdl or .rdlc file</param>
+        /// <exception cref="ArgumentNullException"><paramref name="file"/> must not be null</exception>
+        /// <exception cref="FileNotFoundException"><paramref name="file"/> must exist</exception>
         public ReportDefinition(FileInfo file)
         {
             File = file ?? throw new ArgumentNullException("file");
+            if (!File.Exists) throw new FileNotFoundException(File.FullName);
         }
 
-        public void AddDataSources(IEnumerable<ReportDataSource> sources) => DataSources.UnionWith(sources);
+        /// <summary>Connect</summary>
+        /// <param name="sources"></param>
+        internal void AddDataSources(IEnumerable<ReportDataSource> sources) => DataSources.UnionWith(sources);
 
         //TODO: Add Parameters!
         public DataSet FillDataSets(Action<string> logMessage, string devSqlServer = null)
@@ -58,8 +69,20 @@ namespace SqlReportTools
                     Connection = conn,
                     CommandTimeout = 120,
                 };
-                //TODO: Add Parameters!
-                //cmd.Parameters.Add()
+                foreach(var qParm in rptDataSet.QueryParameters)
+                {
+                    var name = qParm.Name;
+                    var value = qParm.Value;
+                    if(value == null && qParm.Parameter != null)
+                    {
+                        var list = qParm.Parameter.Values.Count > 0 ? qParm.Parameter.Values : qParm.Parameter.DefaultValues;
+                        value =
+                            list.Count == 0 ? (qParm.Parameter.AllowBlank == false  ? string.Empty: null) :
+                            list.Count == 1 ? list[0] :
+                            string.Join(",", list);
+                    }
+                    cmd.Parameters.AddWithValue(name, value);
+                }
 
                 var dataAdapter = new SqlDataAdapter(cmd);
                 dataAdapter.Fill(dataSet, rptDataSet.Name);

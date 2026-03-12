@@ -33,15 +33,15 @@
             this.BtnDataSource = new System.Windows.Forms.Button();
             this.ComboDataSource = new System.Windows.Forms.ComboBox();
             this.Tabs = new System.Windows.Forms.TabControl();
-            this.TabReports = new System.Windows.Forms.TabPage();
             this.TabText = new System.Windows.Forms.TabPage();
-            this.ReportViewer = new Microsoft.Reporting.WinForms.ReportViewer();
             this.TxtReport = new System.Windows.Forms.TextBox();
+            this.TabReports = new System.Windows.Forms.TabPage();
+            this.ReportViewer = new Microsoft.Reporting.WinForms.ReportViewer();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.Tabs.SuspendLayout();
-            this.TabReports.SuspendLayout();
             this.TabText.SuspendLayout();
+            this.TabReports.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -59,7 +59,7 @@
             // 
             // ReportCombo
             // 
-            this.ReportCombo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.ReportCombo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ReportCombo.FormattingEnabled = true;
             this.ReportCombo.Location = new System.Drawing.Point(12, 12);
@@ -82,7 +82,7 @@
             // 
             // ComboDataSource
             // 
-            this.ComboDataSource.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.ComboDataSource.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ComboDataSource.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.ComboDataSource.FormattingEnabled = true;
@@ -94,8 +94,8 @@
             // 
             // Tabs
             // 
-            this.Tabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.Tabs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Tabs.Controls.Add(this.TabText);
             this.Tabs.Controls.Add(this.TabReports);
@@ -104,16 +104,6 @@
             this.Tabs.SelectedIndex = 0;
             this.Tabs.Size = new System.Drawing.Size(1111, 468);
             this.Tabs.TabIndex = 7;
-            // 
-            // TabReports
-            // 
-            this.TabReports.Controls.Add(this.ReportViewer);
-            this.TabReports.Location = new System.Drawing.Point(4, 22);
-            this.TabReports.Name = "TabReports";
-            this.TabReports.Size = new System.Drawing.Size(1094, 378);
-            this.TabReports.TabIndex = 0;
-            this.TabReports.Text = "Reports";
-            this.TabReports.UseVisualStyleBackColor = true;
             // 
             // TabText
             // 
@@ -125,10 +115,32 @@
             this.TabText.Text = "Text";
             this.TabText.UseVisualStyleBackColor = true;
             // 
+            // TxtReport
+            // 
+            this.TxtReport.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TxtReport.Location = new System.Drawing.Point(3, 13);
+            this.TxtReport.Multiline = true;
+            this.TxtReport.Name = "TxtReport";
+            this.TxtReport.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.TxtReport.Size = new System.Drawing.Size(1097, 426);
+            this.TxtReport.TabIndex = 7;
+            // 
+            // TabReports
+            // 
+            this.TabReports.Controls.Add(this.ReportViewer);
+            this.TabReports.Location = new System.Drawing.Point(4, 22);
+            this.TabReports.Name = "TabReports";
+            this.TabReports.Size = new System.Drawing.Size(1103, 442);
+            this.TabReports.TabIndex = 0;
+            this.TabReports.Text = "Report";
+            this.TabReports.UseVisualStyleBackColor = true;
+            // 
             // ReportViewer
             // 
-            this.ReportViewer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.ReportViewer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ReportViewer.DocumentMapWidth = 1;
             this.ReportViewer.Location = new System.Drawing.Point(3, 5);
@@ -136,17 +148,6 @@
             this.ReportViewer.ServerReport.BearerToken = null;
             this.ReportViewer.Size = new System.Drawing.Size(1088, 369);
             this.ReportViewer.TabIndex = 2;
-            // 
-            // TxtReport
-            // 
-            this.TxtReport.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.TxtReport.Location = new System.Drawing.Point(3, 13);
-            this.TxtReport.Multiline = true;
-            this.TxtReport.Name = "TxtReport";
-            this.TxtReport.Size = new System.Drawing.Size(1097, 426);
-            this.TxtReport.TabIndex = 7;
             // 
             // statusStrip1
             // 
@@ -181,9 +182,9 @@
             this.Text = "View Reports";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.Tabs.ResumeLayout(false);
-            this.TabReports.ResumeLayout(false);
             this.TabText.ResumeLayout(false);
             this.TabText.PerformLayout();
+            this.TabReports.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);

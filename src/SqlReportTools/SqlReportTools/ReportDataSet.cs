@@ -22,9 +22,13 @@ namespace SqlReportTools
         /// <remarks>xpath: Report/DataSets/DataSet/Query/CommandText</remarks>
         public string CommandText { get; set; }
 
+        /// <summary>Optional Parameters used to create the data</summary>
+        public List<QueryParameter> QueryParameters { get; }
+
+
         /// <summary>Names of Fields (ignore DataField and TypeName)</summary>
         /// <remarks>xpath: Report/DataSets/DataSet/Fields</remarks>
-        public List<ReportField> Fields { get; private set; } 
+        public List<ReportField> Fields { get; } 
 
         public bool IsValid =>
             !string.IsNullOrEmpty(Name) &&
@@ -35,6 +39,7 @@ namespace SqlReportTools
         public ReportDataSet()
         {
             Fields = new List<ReportField>();
+            QueryParameters = new List<QueryParameter>();
         }
 
     }

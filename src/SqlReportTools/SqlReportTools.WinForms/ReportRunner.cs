@@ -1,5 +1,6 @@
 ﻿using Microsoft.Reporting.WinForms;
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
@@ -7,22 +8,23 @@ using System.Linq;
 
 namespace SqlReportTools.WinForms
 {
+    /// <summary>Coordinates between</summary>
     public class ReportRunner
     {
         private Settings Settings { get; }
-        private Action<string> SendMessage { get; }
+        private Action<string> Logger { get; }
 
         public ReportManager RdlManager { get; } 
         public DataSourceManager RdsManager { get; } 
 
 
-        public ReportRunner(Settings settings, Action<string> sendMessage)
+        public ReportRunner(Settings settings, Action<string> logger)
         {
             Settings = settings;
-            SendMessage = sendMessage;
+            Logger = logger;
  
-            RdlManager = new ReportManager();
-            RdsManager = new DataSourceManager();
+            RdlManager = new ReportManager(Logger);
+            RdsManager = new DataSourceManager(Logger);
         }
 
         public void ScanFiles()
@@ -31,7 +33,7 @@ namespace SqlReportTools.WinForms
             RdlManager.AddReports(RdsManager, Settings.SqlReportsDirectory);
         }
 
-        public ReportDefinition LocateReport(FileInfo reportFile)
+        public ReportDefinition GetReportDefinition(FileInfo reportFile)
         {
 
             if (!reportFile.Exists)
@@ -52,11 +54,11 @@ namespace SqlReportTools.WinForms
             return report;
         }
 
-        public void Run(ReportViewer viewer, ReportDefinition report)
+        public bool Run(ReportViewer viewer, ReportDefinition report)
         {
             if (report == null || report.File == null || !report.File.Exists)
             {
-                return;
+                return false;
             }
 
             // Set the processing mode for the ReportViewer to Local  
@@ -64,7 +66,7 @@ namespace SqlReportTools.WinForms
             viewer.LocalReport.ReportPath = report.File.FullName;
 
             var localReport = viewer.LocalReport;
-            AddReportParameter(localReport);
+            AddReportParameter(report, localReport);
 
             // -------------------------
             // Data Sets
@@ -75,34 +77,32 @@ namespace SqlReportTools.WinForms
                 AddDataSetToLocalReport(localReport, dataSet);
 
                 AddDataSources(localReport, report);
+                return true;
             }
             catch(Exception ex)
             {
                 Log($"Exception: {ex.GetType().Name} {ex.Message}");
+                return false;
             }
-
-            // Refresh the report  
-            viewer.RefreshReport();
+            finally
+            {
+                // Refresh the report  
+                viewer.RefreshReport();
+            }
         }
 
         /// <summary>Add Parameters to the Report</summary>
-        private void AddReportParameter(LocalReport localReport)
+        private void AddReportParameter(ReportDefinition report, LocalReport localReport)
         {
-            foreach (var parm in localReport.GetParameters())
+            foreach (ReportParameterInfo parm in localReport.GetParameters())
             {
                 Log($"Parameter: {parm.Name} = {parm.DataType}");
+                var rptParm = report.Parameters.FirstOrDefault(x => x.Name == parm.Name);
+                if(rptParm != null)
+                {
+                    parm.Values = rptParm.Values.Count > 0 ? rptParm.Values : rptParm.DefaultValues;
+                }
             }
-
-            //// Create a report parameter for the sales order number   
-            //ReportParameter rpSalesOrderNumber = new ReportParameter
-            //{
-            //    Name = "SalesOrderNumber",
-            //    Values = new StringCollection() { TableName },
-            //};
-
-            //// Set the report parameters for the report  
-            //localReport.SetParameters(
-            //    new ReportParameter[] { rpSalesOrderNumber });
         }
 
 
@@ -136,10 +136,11 @@ namespace SqlReportTools.WinForms
             }
         }
 
+        [DebuggerStepThrough]
         private void Log(string message)
         {
             Trace.WriteLine(message);
-            SendMessage?.Invoke(message);
+            Logger?.Invoke(message);
         } 
 
  

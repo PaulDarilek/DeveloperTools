@@ -13,12 +13,10 @@ namespace SqlReportTools.WinForms
 
         public ViewReport(Settings settings)
         {
-
-            Helper = new ReportRunner(settings, AppendMessage);
             InitializeComponent();
 
-            Text = "View Report Form";
-            //ClientSize = new Size(640, 320);
+            Helper = new ReportRunner(settings, AppendMessage);
+
             CenterToScreen();
         }
 
@@ -55,15 +53,16 @@ namespace SqlReportTools.WinForms
         private void BtnOpenReport_Click(object sender, EventArgs e)
         {
             ClearMessage();
-            var report = Helper.LocateReport(new FileInfo(ReportCombo.Text));
+            var report = Helper.GetReportDefinition(new FileInfo(ReportCombo.Text));
             if (report != null)
             {
-                Helper.Run(this.ReportViewer, report);
-                TabReports.Focus();
+                var success = Helper.Run(ReportViewer, report);
+                Tabs.SelectedIndex = success ? 1 : 0;
             }
         }
 
         private void AppendMessage(string message) => this.TxtReport.Text += Environment.NewLine + message;
+        
         private void ClearMessage() => this.TxtReport.Text = string.Empty;
 
         private void BtnDataSource_Click(object sender, EventArgs e)
@@ -81,6 +80,7 @@ namespace SqlReportTools.WinForms
                     .ToList();
                 foreach (var report in usage)
                 {
+
                     AppendMessage(report.File.FullName);
                 }
             }
@@ -89,8 +89,10 @@ namespace SqlReportTools.WinForms
         private void ReportCombo_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (IgnoreCombo) return;
+            ReportViewer.Reset();
+            Tabs.SelectedIndex = 0;
             ClearMessage();
-            var report = Helper.LocateReport(new FileInfo(ReportCombo.Text));
+            var report = Helper.GetReportDefinition(new FileInfo(ReportCombo.Text));
             if (report != null)
             {
                 var json = JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true });
@@ -101,6 +103,7 @@ namespace SqlReportTools.WinForms
         private void ComboDataSource_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (IgnoreCombo) return;
+            Tabs.SelectedIndex = 0;
             var text = ComboDataSource.Text;
             var posStart = text.LastIndexOf('[');
             var posEnd = text.IndexOf(']', Math.Max(0, posStart));
