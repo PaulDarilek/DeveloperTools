@@ -39,10 +39,14 @@
             this.ReportViewer = new Microsoft.Reporting.WinForms.ReportViewer();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.TabParms = new System.Windows.Forms.TabPage();
+            this.GridView = new System.Windows.Forms.DataGridView();
             this.Tabs.SuspendLayout();
             this.TabText.SuspendLayout();
             this.TabReports.SuspendLayout();
             this.statusStrip1.SuspendLayout();
+            this.TabParms.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.GridView)).BeginInit();
             this.SuspendLayout();
             // 
             // BtnOpenReport
@@ -99,6 +103,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Tabs.Controls.Add(this.TabText);
             this.Tabs.Controls.Add(this.TabReports);
+            this.Tabs.Controls.Add(this.TabParms);
             this.Tabs.Location = new System.Drawing.Point(5, 70);
             this.Tabs.Name = "Tabs";
             this.Tabs.SelectedIndex = 0;
@@ -165,6 +170,24 @@
             this.StatusLabel.Size = new System.Drawing.Size(156, 17);
             this.StatusLabel.Text = "Select Report or Data Source";
             // 
+            // TabParms
+            // 
+            this.TabParms.Controls.Add(this.GridView);
+            this.TabParms.Location = new System.Drawing.Point(4, 22);
+            this.TabParms.Name = "TabParms";
+            this.TabParms.Size = new System.Drawing.Size(1103, 442);
+            this.TabParms.TabIndex = 2;
+            this.TabParms.Text = "Parameters";
+            this.TabParms.UseVisualStyleBackColor = true;
+            // 
+            // GridView
+            // 
+            this.GridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.GridView.Location = new System.Drawing.Point(4, 4);
+            this.GridView.Name = "GridView";
+            this.GridView.Size = new System.Drawing.Size(1096, 424);
+            this.GridView.TabIndex = 0;
+            // 
             // ViewReport
             // 
             this.AccessibleRole = System.Windows.Forms.AccessibleRole.SplitButton;
@@ -187,6 +210,8 @@
             this.TabReports.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            this.TabParms.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.GridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -204,5 +229,7 @@
         private Microsoft.Reporting.WinForms.ReportViewer ReportViewer;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel StatusLabel;
+        private System.Windows.Forms.TabPage TabParms;
+        private System.Windows.Forms.DataGridView GridView;
     }
 }

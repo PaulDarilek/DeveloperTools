@@ -97,6 +97,26 @@ namespace SqlReportTools.WinForms
             {
                 var json = JsonSerializer.Serialize(report, new JsonSerializerOptions { WriteIndented = true });
                 AppendMessage(json);
+                var InputList = report.Parameters.Select(x => new InputParameter(x)).ToList();
+                if (InputList.Count > 0)
+                {
+                    GridView.DataSource = InputList;
+
+                    if (Tabs.SelectedIndex != 2)
+                    {
+                        Tabs.SelectedIndex = 2;
+                    }
+                }
+                else
+                {
+                    GridView.DataSource = null;
+                    if (Tabs.SelectedIndex != 0)
+                    {
+                        Tabs.SelectedIndex = 0;
+                    }
+                }
+
+                ReportCombo.Focus();
             }
         }
 

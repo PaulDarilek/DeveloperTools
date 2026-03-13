@@ -100,7 +100,7 @@ namespace SqlReportTools.WinForms
                 var rptParm = report.Parameters.FirstOrDefault(x => x.Name == parm.Name);
                 if(rptParm != null)
                 {
-                    parm.Values = rptParm.Values.Count > 0 ? rptParm.Values : rptParm.DefaultValues;
+                    parm.Values = rptParm.Value?.Split(',').ToList() ?? rptParm.DefaultValues;
                 }
             }
         }

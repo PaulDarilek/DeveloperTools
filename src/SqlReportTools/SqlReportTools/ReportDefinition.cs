@@ -73,14 +73,6 @@ namespace SqlReportTools
                 {
                     var name = qParm.Name;
                     var value = qParm.Value;
-                    if(value == null && qParm.Parameter != null)
-                    {
-                        var list = qParm.Parameter.Values.Count > 0 ? qParm.Parameter.Values : qParm.Parameter.DefaultValues;
-                        value =
-                            list.Count == 0 ? (qParm.Parameter.AllowBlank == false  ? string.Empty: null) :
-                            list.Count == 1 ? list[0] :
-                            string.Join(",", list);
-                    }
                     cmd.Parameters.AddWithValue(name, value);
                 }
 

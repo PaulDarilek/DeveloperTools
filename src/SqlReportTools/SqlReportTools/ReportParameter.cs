@@ -17,14 +17,6 @@ namespace SqlReportTools
                 <UsedInQuery>True</UsedInQuery>
             </ReportParameter>
         </ReportParameters>
-
-        <Query>
-            <QueryParameters>
-              <QueryParameter Name="@EmployeeName">
-                <Value>=Parameters!EmployeeName.Value</Value>
-              </QueryParameter>
-            </QueryParameters>
-        </Query>
      */
 
     /// <summary>ReportParameters from SSRS *.rdl file</summary>
@@ -35,7 +27,7 @@ namespace SqlReportTools
         public string Name { get; set; }
 
         /// <summary>Value of the Parameter after input</summary>
-        public List<string> Values { get; }   = new List<string>();
+        public string Value { get; set; }   
 
         /// <summary>name like "String" (xpath = /ReportParameters/ReportParameter[Name]/DataType)</summary>
         public string DataType { get; set; }
@@ -59,15 +51,29 @@ namespace SqlReportTools
         /// <summary>(xpath = /ReportParameters/ReportParameter[Name]/MultiValue)</summary>
         public bool? MultiValue { get; set; }
 
-        public string GetValue()
-        {
-            var values = Values.Count > 0 ? Values : DefaultValues;
-            return
-                (values.Count == 0) ? null :
-                (values.Count == 1) ? values[0] :
-                string.Join(",", values);
-        } 
+        public string GetValue() => Value ?? string.Join(",", DefaultValues);
 
+        public bool IsValidValue(string value)
+        {
+            if (string.IsNullOrEmpty(value) && AllowBlank.HasValue) return AllowBlank.Value;
+
+
+            if (ValidValues.Count > 0)
+            {
+                if (MultiValue == true && value != null)
+                {
+                    foreach (var item in value.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        if (ValidValues.Any(x => x.Value == item || x.Value?.Equals(item) == true))
+                            return true;
+                    }
+                }
+
+                return ValidValues.Any(x => x.Value == value || x.Value?.Equals(value) == true);
+            }
+
+            return true;
+        }
     }
 
     [DebuggerStepThrough]
