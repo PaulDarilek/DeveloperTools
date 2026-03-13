@@ -1,6 +1,5 @@
 ﻿using Microsoft.Reporting.WinForms;
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
@@ -73,7 +72,7 @@ namespace SqlReportTools.WinForms
             // -------------------------
             try
             {
-                var dataSet = report.FillDataSets(Log, Settings.DevSqlServer);
+                var dataSet = report.FillDataSets(Log, Settings.SqlServer);
                 AddDataSetToLocalReport(localReport, dataSet);
 
                 AddDataSources(localReport, report);

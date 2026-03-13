@@ -1,5 +1,4 @@
-﻿using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -46,8 +45,12 @@ namespace SqlReportTools
         {
             ReportDefinition report = new ReportDefinition(file);
             ParseXml(report, dataSourceManager);
+            var crLfTab = Environment.NewLine + '\t';
+            Log($"{report.File.FullName} {crLfTab}{string.Join(crLfTab, report.DataSets.Select(Format))}");
             AddReport(report);
             return report;
+
+            string Format(ReportDataSet x) => $"[{x.Name}] = {x.CommandText}";
         }
 
         /// <summary>Reads the Report RDL File and parses the XML</summary>
@@ -132,8 +135,6 @@ namespace SqlReportTools
 
                     if (validValues != null && parameterValues != null)
                     {
-                        Log($"{report.File.FullName} Has Parameters.");
-
                         foreach (var parmValue in parameterValues.Elements(ns + "ParameterValue"))
                         {
                             var pValue = new ValidValue

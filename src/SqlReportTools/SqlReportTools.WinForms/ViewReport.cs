@@ -8,14 +8,16 @@ namespace SqlReportTools.WinForms
 {
     public partial class ViewReport : Form
     {
-        public ReportRunner Helper { get; }
+        private Settings Settings { get; }
+        private ReportRunner Helper { get; }
         private bool IgnoreCombo { get; set;  }
 
         public ViewReport(Settings settings)
         {
-            InitializeComponent();
-
+            Settings = settings;
             Helper = new ReportRunner(settings, AppendMessage);
+
+            InitializeComponent();
 
             CenterToScreen();
         }
@@ -35,6 +37,9 @@ namespace SqlReportTools.WinForms
                 IgnoreCombo = false;
             }
 
+            TxtInputFolder.Text = Settings.SqlReportsDirectory.FullName;
+            TxtOutputFolder.Text = Settings.OutputDirectory?.FullName;
+            TxtSqlServer.Text = Settings.SqlServer;
         }
 
         private void FillCombos()
@@ -138,6 +143,22 @@ namespace SqlReportTools.WinForms
                     AppendMessage(json);
                 }
             }
+        }
+
+        private void BtnSaveSettings_Click(object sender, EventArgs e)
+        {
+            Settings.SqlServer = string.IsNullOrEmpty(TxtSqlServer.Text) ? null : TxtSqlServer.Text;
+
+            if (! string.IsNullOrEmpty(TxtInputFolder.Text))
+                Settings.SqlReportsDirectory = new DirectoryInfo(TxtInputFolder.Text);
+
+            Settings.OutputDirectory = 
+                string.IsNullOrEmpty(TxtOutputFolder.Text) ? 
+                null : 
+                new DirectoryInfo(TxtOutputFolder.Text);
+
+            Helper.ScanFiles();
+            Tabs.SelectedIndex = 0;
         }
     }
 }

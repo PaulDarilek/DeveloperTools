@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
 using System.IO;
-using System.Linq;
 
 namespace SqlReportTools.WinForms
 {
@@ -14,7 +13,7 @@ namespace SqlReportTools.WinForms
         public DirectoryInfo OutputDirectory { get; set; }
 
         /// <summary>Optional Sql Server to over-ride the connection string</summary>
-        public string DevSqlServer { get; set; }
+        public string SqlServer { get; set; }
 
         /// <summary></summary>
         /// <param name="config"></param>
@@ -32,10 +31,10 @@ namespace SqlReportTools.WinForms
                 OutputDirectory = new DirectoryInfo(value);
             }
 
-            value = config[nameof(DevSqlServer)];
+            value = config[nameof(SqlServer)];
             if (!string.IsNullOrWhiteSpace(value))
             {
-                DevSqlServer = value;
+                SqlServer = value;
             }
 
         }

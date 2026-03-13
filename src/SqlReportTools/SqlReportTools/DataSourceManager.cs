@@ -99,8 +99,6 @@ namespace SqlReportTools
                 DataSources.Add(dataSource);
             }
 
-            Log($"DataSource: {match.File?.FullName ?? match.DataSourceID} = {match.ConnectString}");
-
             return match;
         }
 

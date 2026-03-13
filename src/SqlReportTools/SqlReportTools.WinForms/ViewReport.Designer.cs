@@ -37,16 +37,25 @@
             this.TxtReport = new System.Windows.Forms.TextBox();
             this.TabReports = new System.Windows.Forms.TabPage();
             this.ReportViewer = new Microsoft.Reporting.WinForms.ReportViewer();
-            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.TabParms = new System.Windows.Forms.TabPage();
             this.GridView = new System.Windows.Forms.DataGridView();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.StatusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.TabSettings = new System.Windows.Forms.TabPage();
+            this.LblInputFolder = new System.Windows.Forms.Label();
+            this.TxtInputFolder = new System.Windows.Forms.TextBox();
+            this.TxtOutputFolder = new System.Windows.Forms.TextBox();
+            this.LblOutputFolder = new System.Windows.Forms.Label();
+            this.TxtSqlServer = new System.Windows.Forms.TextBox();
+            this.LblSqlServer = new System.Windows.Forms.Label();
+            this.BtnSaveSettings = new System.Windows.Forms.Button();
             this.Tabs.SuspendLayout();
             this.TabText.SuspendLayout();
             this.TabReports.SuspendLayout();
-            this.statusStrip1.SuspendLayout();
             this.TabParms.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.GridView)).BeginInit();
+            this.statusStrip1.SuspendLayout();
+            this.TabSettings.SuspendLayout();
             this.SuspendLayout();
             // 
             // BtnOpenReport
@@ -104,6 +113,7 @@
             this.Tabs.Controls.Add(this.TabText);
             this.Tabs.Controls.Add(this.TabReports);
             this.Tabs.Controls.Add(this.TabParms);
+            this.Tabs.Controls.Add(this.TabSettings);
             this.Tabs.Location = new System.Drawing.Point(5, 70);
             this.Tabs.Name = "Tabs";
             this.Tabs.SelectedIndex = 0;
@@ -154,22 +164,6 @@
             this.ReportViewer.Size = new System.Drawing.Size(1088, 369);
             this.ReportViewer.TabIndex = 2;
             // 
-            // statusStrip1
-            // 
-            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.StatusLabel});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 538);
-            this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(1126, 22);
-            this.statusStrip1.TabIndex = 8;
-            this.statusStrip1.Text = "statusStrip1";
-            // 
-            // StatusLabel
-            // 
-            this.StatusLabel.Name = "StatusLabel";
-            this.StatusLabel.Size = new System.Drawing.Size(156, 17);
-            this.StatusLabel.Text = "Select Report or Data Source";
-            // 
             // TabParms
             // 
             this.TabParms.Controls.Add(this.GridView);
@@ -187,6 +181,100 @@
             this.GridView.Name = "GridView";
             this.GridView.Size = new System.Drawing.Size(1096, 424);
             this.GridView.TabIndex = 0;
+            // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.StatusLabel});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 538);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(1126, 22);
+            this.statusStrip1.TabIndex = 8;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // StatusLabel
+            // 
+            this.StatusLabel.Name = "StatusLabel";
+            this.StatusLabel.Size = new System.Drawing.Size(156, 17);
+            this.StatusLabel.Text = "Select Report or Data Source";
+            // 
+            // TabSettings
+            // 
+            this.TabSettings.Controls.Add(this.BtnSaveSettings);
+            this.TabSettings.Controls.Add(this.TxtSqlServer);
+            this.TabSettings.Controls.Add(this.LblSqlServer);
+            this.TabSettings.Controls.Add(this.TxtOutputFolder);
+            this.TabSettings.Controls.Add(this.LblOutputFolder);
+            this.TabSettings.Controls.Add(this.TxtInputFolder);
+            this.TabSettings.Controls.Add(this.LblInputFolder);
+            this.TabSettings.Location = new System.Drawing.Point(4, 22);
+            this.TabSettings.Name = "TabSettings";
+            this.TabSettings.Size = new System.Drawing.Size(1103, 442);
+            this.TabSettings.TabIndex = 3;
+            this.TabSettings.Text = "Settings";
+            this.TabSettings.UseVisualStyleBackColor = true;
+            // 
+            // LblInputFolder
+            // 
+            this.LblInputFolder.Location = new System.Drawing.Point(16, 31);
+            this.LblInputFolder.Name = "LblInputFolder";
+            this.LblInputFolder.Size = new System.Drawing.Size(141, 23);
+            this.LblInputFolder.TabIndex = 0;
+            this.LblInputFolder.Text = "Input Folder (*.rdl)";
+            // 
+            // TxtInputFolder
+            // 
+            this.TxtInputFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TxtInputFolder.Location = new System.Drawing.Point(163, 33);
+            this.TxtInputFolder.Name = "TxtInputFolder";
+            this.TxtInputFolder.Size = new System.Drawing.Size(906, 20);
+            this.TxtInputFolder.TabIndex = 1;
+            // 
+            // TxtOutputFolder
+            // 
+            this.TxtOutputFolder.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TxtOutputFolder.Location = new System.Drawing.Point(163, 76);
+            this.TxtOutputFolder.Name = "TxtOutputFolder";
+            this.TxtOutputFolder.Size = new System.Drawing.Size(906, 20);
+            this.TxtOutputFolder.TabIndex = 3;
+            // 
+            // LblOutputFolder
+            // 
+            this.LblOutputFolder.Location = new System.Drawing.Point(16, 74);
+            this.LblOutputFolder.Name = "LblOutputFolder";
+            this.LblOutputFolder.Size = new System.Drawing.Size(141, 23);
+            this.LblOutputFolder.TabIndex = 2;
+            this.LblOutputFolder.Text = "Output Folder";
+            // 
+            // TxtSqlServer
+            // 
+            this.TxtSqlServer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TxtSqlServer.Location = new System.Drawing.Point(163, 125);
+            this.TxtSqlServer.Name = "TxtSqlServer";
+            this.TxtSqlServer.Size = new System.Drawing.Size(906, 20);
+            this.TxtSqlServer.TabIndex = 5;
+            // 
+            // LblSqlServer
+            // 
+            this.LblSqlServer.Location = new System.Drawing.Point(16, 123);
+            this.LblSqlServer.Name = "LblSqlServer";
+            this.LblSqlServer.Size = new System.Drawing.Size(141, 23);
+            this.LblSqlServer.TabIndex = 4;
+            this.LblSqlServer.Text = "SQL Server (override)";
+            // 
+            // BtnSave
+            // 
+            this.BtnSaveSettings.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.BtnSaveSettings.Location = new System.Drawing.Point(994, 184);
+            this.BtnSaveSettings.Name = "BtnSave";
+            this.BtnSaveSettings.Size = new System.Drawing.Size(75, 23);
+            this.BtnSaveSettings.TabIndex = 6;
+            this.BtnSaveSettings.Text = "Save Settings";
+            this.BtnSaveSettings.UseVisualStyleBackColor = true;
+            this.BtnSaveSettings.Click += new System.EventHandler(this.BtnSaveSettings_Click);
             // 
             // ViewReport
             // 
@@ -208,10 +296,12 @@
             this.TabText.ResumeLayout(false);
             this.TabText.PerformLayout();
             this.TabReports.ResumeLayout(false);
-            this.statusStrip1.ResumeLayout(false);
-            this.statusStrip1.PerformLayout();
             this.TabParms.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.GridView)).EndInit();
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
+            this.TabSettings.ResumeLayout(false);
+            this.TabSettings.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -231,5 +321,13 @@
         private System.Windows.Forms.ToolStripStatusLabel StatusLabel;
         private System.Windows.Forms.TabPage TabParms;
         private System.Windows.Forms.DataGridView GridView;
+        private System.Windows.Forms.TabPage TabSettings;
+        private System.Windows.Forms.TextBox TxtOutputFolder;
+        private System.Windows.Forms.Label LblOutputFolder;
+        private System.Windows.Forms.TextBox TxtInputFolder;
+        private System.Windows.Forms.Label LblInputFolder;
+        private System.Windows.Forms.Button BtnSaveSettings;
+        private System.Windows.Forms.TextBox TxtSqlServer;
+        private System.Windows.Forms.Label LblSqlServer;
     }
 }
