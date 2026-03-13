@@ -50,7 +50,7 @@ namespace SqlReportTools
             AddReport(report);
             return report;
 
-            string Format(ReportDataSet x) => $"[{x.Name}] = {x.CommandText}";
+            string Format(ReportDataSet x) => $"{x.DataSourceName} [{x.Name}] = {x.CommandText}";
         }
 
         /// <summary>Reads the Report RDL File and parses the XML</summary>

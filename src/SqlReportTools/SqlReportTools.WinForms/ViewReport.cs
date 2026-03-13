@@ -157,6 +157,7 @@ namespace SqlReportTools.WinForms
                 null : 
                 new DirectoryInfo(TxtOutputFolder.Text);
 
+            ClearMessage();
             Helper.ScanFiles();
             Tabs.SelectedIndex = 0;
         }
